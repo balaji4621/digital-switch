@@ -13,7 +13,8 @@ const OUTPUT_TRIP_HAZARD: &str = "trip_hazard_prob";
 const HAZARD_THRESHOLD: f32 = 0.85;
 
 /// Hardcoded routes corresponding to argmax of route_logits (3 classes)
-const ROUTE_LABELS: [&str; 3] = ["cooling", "relay", "bypass"];
+/// 0 = SOLAR_PRIORITY, 1 = GRID_THROTTLE, 2 = EMERGENCY_ISOLATE
+const ROUTE_LABELS: [&str; 3] = ["solar_priority", "grid_throttle", "emergency_isolate"];
 
 /// Load scaler mean and scale from .npy files
 fn load_scaler<P: AsRef<Path>>(mean_path: P, scale_path: P) -> Result<(Array1<f32>, Array1<f32>)> {
@@ -31,6 +32,7 @@ fn load_scaler<P: AsRef<Path>>(mean_path: P, scale_path: P) -> Result<(Array1<f3
 }
 
 /// Run inference on a single 4-element telemetry array
+/// Telemetry order: [v_grid (V), i_grid (A), p_solar_kw, p_ev_demand_kw]
 pub fn run_inference_raw(
     session: &mut Session,
     telemetry: &[f64; 4],

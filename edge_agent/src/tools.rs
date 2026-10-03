@@ -13,8 +13,7 @@ const ROUTE_LABELS: [&str; 3] = ["cooling", "relay", "bypass"];
 /// Parameters for the `evaluate` MCP tool: a 4-element telemetry array.
 #[derive(Debug, Deserialize, JsonSchema)]
 pub struct TelemetryParams {
-    /// Raw telemetry: [phase_voltage_imbalance_pct, motor_current_A,
-    ///                 water_flow_rate_Lmin, pump_temperature_C]
+    /// Raw telemetry: [v_grid (V), i_grid (A), p_solar_kw, p_ev_demand_kw]
     pub telemetry: Vec<f64>,
 }
 

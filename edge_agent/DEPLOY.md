@@ -98,8 +98,9 @@ Copy the following files from the host to the target board:
 cp target/aarch64-unknown-linux-gnu/release/edge_agent /opt/tejas/
 sudo chmod +x /opt/tejas/edge_agent
 
-# Copy the ONNX model and scalers
+# Copy the ONNX model, external weights, and scalers
 cp ../super_edge_engine/laya_student_engine.onnx /opt/tejas/
+cp ../super_edge_engine/laya_student_engine.onnx.data /opt/tejas/
 cp ../super_edge_engine/scaler_mean.npy /opt/tejas/
 cp ../super_edge_engine/scaler_scale.npy /opt/tejas/
 
@@ -107,6 +108,7 @@ cp ../super_edge_engine/scaler_scale.npy /opt/tejas/
 sudo chown root:root /opt/tejas/edge_agent
 sudo chmod 755 /opt/tejas/edge_agent
 sudo chown root:root /opt/tejas/laya_student_engine.onnx
+sudo chown root:root /opt/tejas/laya_student_engine.onnx.data
 sudo chown root:root /opt/tejas/scaler_mean.npy
 sudo chown root:root /opt/tejas/scaler_scale.npy
 ```
@@ -139,18 +141,20 @@ cross build --target aarch64-unknown-linux-musl --release
 
 ### Required Files
 
-The deployment requires three files:
+The deployment requires four files:
 
 1. **`edge_agent`** — The compiled binary (ARM64 executable)
 2. **`laya_student_engine.onnx`** — ONNX model file (12,809 bytes)
-3. **`scaler_mean.npy`** — Telemetry offset array (160 bytes)
-4. **`scaler_scale.npy`** — Telemetry scale divisor array (160 bytes)
+3. **`laya_student_engine.onnx.data`** — External weights file (9,600 bytes)
+4. **`scaler_mean.npy`** — Telemetry offset array (160 bytes) for [v_grid, i_grid, p_solar_kw, p_ev_demand_kw]
+5. **`scaler_scale.npy`** — Telemetry scale divisor array (160 bytes)
 
 ### File Locations
 
 **Host (for build):**
 - Binary: `target/aarch64-unknown-linux-gnu/release/edge_agent`
 - Model: `../super_edge_engine/laya_student_engine.onnx`
+- External weights: `../super_edge_engine/laya_student_engine.onnx.data`
 - Scalers: `../super_edge_engine/scaler_mean.npy`, `../super_edge_engine/scaler_scale.npy`
 
 **Target Board:**
@@ -231,11 +235,16 @@ ssh $TARGET_HOST "mkdir -p $TARGET_DIR"
 # Copy files
 ssh $TARGET_HOST "scp target/aarch64-unknown-linux-gnu/release/edge_agent $TARGET_USER@$TARGET_HOST:$TARGET_DIR/"
 ssh $TARGET_HOST "scp ../super_edge_engine/laya_student_engine.onnx $TARGET_USER@$TARGET_HOST:$TARGET_DIR/"
+ssh $TARGET_HOST "scp ../super_edge_engine/laya_student_engine.onnx.data $TARGET_USER@$TARGET_HOST:$TARGET_DIR/"
 ssh $TARGET_HOST "scp ../super_edge_engine/scaler_mean.npy $TARGET_USER@$TARGET_HOST:$TARGET_DIR/"
 ssh $TARGET_HOST "scp ../super_edge_engine/scaler_scale.npy $TARGET_USER@$TARGET_HOST:$TARGET_DIR/"
 
 # Set permissions
 ssh $TARGET_HOST "chown root:root $TARGET_DIR/edge_agent && chmod 755 $TARGET_DIR/edge_agent"
+ssh $TARGET_HOST "chown root:root $TARGET_DIR/laya_student_engine.onnx"
+ssh $TARGET_HOST "chown root:root $TARGET_DIR/laya_student_engine.onnx.data"
+ssh $TARGET_HOST "chown root:root $TARGET_DIR/scaler_mean.npy"
+ssh $TARGET_HOST "chown root:root $TARGET_DIR/scaler_scale.npy"
 
 # Verify installation
 ssh $TARGET_HOST "$TARGET_DIR/edge_agent"

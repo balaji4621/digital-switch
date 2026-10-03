@@ -43,11 +43,11 @@
 
 ## 🎯 Overview
 
-**TEJAS 2026** is an embedded **System 1 decision engine** that runs locally on ARM64 edge devices. It ingests 4-channel microgrid telemetry, runs a distilled **Laya** student model via ONNX Runtime, and executes physical hardware actions (PWM cooling, GPIO relay, bypass) — all exposed as an MCP tool over stdio.
+**TEJAS 2026** is an embedded **System 1 decision engine** that runs locally on ARM64 edge devices. It ingests 4-channel microgrid telemetry, runs a distilled **Laya** student model via ONNX Runtime, and executes physical hardware actions — all exposed as an MCP tool over stdio.
 
 | Feature | Description |
 |---------|-------------|
-| ⚡ **Latency** | ~33 ms inference (ONNX Runtime) |
+| ⚡ **Latency** | **~21 µs (0.021 ms)** per inference — **47,000 inferences/sec** on CPU |
 | 🛡 **Safety** | Hard-coded trip hazard gate at p > 0.85 |
 | 🦀 **Language** | Rust 2021 — zero-cost abstractions |
 | 🎯 **Target** | `aarch64-unknown-linux-gnu` (Raspberry Pi, Jetson, BeagleBone) |
@@ -107,6 +107,7 @@ digital-switch/
 │   └── Cargo.lock
 ├── super_edge_engine/             # Model assets (deployed to /opt/tejas/)
 │   ├── laya_student_engine.onnx   # 12 KB distilled model
+│   ├── laya_student_engine.onnx.data  # External weights
 │   ├── scaler_mean.npy            # 4-element float64 mean
 │   └── scaler_scale.npy           # 4-element float64 scale
 ├── laya/                          # Laya decision engine (submodule)
@@ -150,6 +151,7 @@ sudo chown $USER:$USER /opt/tejas
 scp target/aarch64-unknown-linux-gnu/release/edge_agent \
     user@target:/opt/tejas/
 scp super_edge_engine/laya_student_engine.onnx \
+    super_edge_engine/laya_student_engine.onnx.data \
     super_edge_engine/scaler_mean.npy \
     super_edge_engine/scaler_scale.npy \
     user@target:/opt/tejas/
@@ -177,25 +179,25 @@ The agent now listens on stdio for MCP tool calls.
   "params": {
     "name": "evaluate",
     "arguments": {
-      "telemetry": [2.5, 8.2, 45.0, 42.0]
+      "telemetry": [230.0, 12.0, 6.0, 2.0]
     }
   }
 }
 ```
 
 **Telemetry fields (order matters):**
-1. `phase_voltage_imbalance_pct` — Grid phase imbalance %
-2. `motor_current_A` — Motor current in Amperes
-3. `water_flow_rate_Lmin` — Water flow in L/min
-4. `pump_temperature_C` — Pump temperature in °C
+1. `v_grid` — Grid voltage (V)
+2. `i_grid` — Grid current (A)
+3. `p_solar_kw` — Solar power (kW)
+4. `p_ev_demand_kw` — EV demand (kW)
 
 ### Response (Success)
 
 ```json
 {
-  "action": "cooling",
-  "throttle_level": 2.34,
-  "trip_hazard_probability": 0.12,
+  "action": "solar_priority",
+  "throttle_level": 0.52,
+  "trip_hazard_probability": 0.08,
   "model_used": "laya_student_engine",
   "confidence": 1.0
 }
@@ -207,7 +209,7 @@ The agent now listens on stdio for MCP tool calls.
 {
   "error": {
     "code": -32603,
-    "message": "safety gate triggered: cooling"
+    "message": "safety gate triggered: emergency_isolate"
   }
 }
 ```
