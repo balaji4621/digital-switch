@@ -1,0 +1,37 @@
+[package]
+name = "edge_agent"
+version = "0.1.0"
+edition = "2021"
+description = "TEJAS 2026 edge AI agent: ONNX inference + MCP tool server with hardware actuation"
+authors = ["TEJAS 2026"]
+
+[dependencies]
+tokio = { version = "1", features = ["full"] }
+
+# ONNX Runtime (v2.x API)
+ort = "2.0.0-rc.13"
+
+# N-dimensional array math + numpy (.npy) I/O
+ndarray = "0.17"
+ndarray-npy = "0.10"
+
+# Official Model Context Protocol Rust SDK (stdio transport)
+rmcp = { version = "3.5", features = ["transport-io", "server"] }
+
+# JSON schema + serde for the MCP tool parameter struct
+schemars = "0.8"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+# Error handling
+anyhow = "1"
+
+# Async runtime support for hardware operations
+futures = "0.3"
+
+[features]
+# Default features for embedded ARM Linux
+linux = []
+
+[target.aarch64-unknown-linux-gnu]
+linker = "aarch64-linux-gnu-gcc"

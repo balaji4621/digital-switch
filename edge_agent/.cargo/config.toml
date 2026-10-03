@@ -1,0 +1,5 @@
+# Cargo config: use the MSVC-flavored rust-lld (bundled with the toolchain)
+# as the linker so we don't need Visual Studio Build Tools or an external
+# C compiler. rust-lld.exe is lld-link.exe built with the MSVC flavor.
+[target.x86_64-pc-windows-msvc]
+linker = "C:\\Users\\ADMIN\\.rustup\\toolchains\\stable-x86_64-pc-windows-msvc\\lib\\rustlib\\x86_64-pc-windows-msvc\\bin\\rust-lld.exe"
