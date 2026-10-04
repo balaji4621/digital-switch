@@ -38,7 +38,7 @@
 
 ## 🎯 Overview
 
-**TEJAS 2026** is an embedded **System 1 decision engine** that runs locally on ARM64 edge devices. It ingests 4-channel microgrid telemetry, runs a distilled **Laya** student model via ONNX Runtime, and executes physical hardware actions — all exposed as an MCP tool over stdio.
+ is an embedded **System 1 decision engine** that runs locally on ARM64 edge devices. It ingests 4-channel microgrid telemetry, runs a distilled **Laya** student model via ONNX Runtime, and executes physical hardware actions — all exposed as an MCP tool over stdio.
 
 | Feature | Description |
 |---------|-------------|
