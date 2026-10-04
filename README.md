@@ -1,11 +1,6 @@
-<p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/NandhaKishorM/laya/main/assets/logo-lockup-dark.png" />
-    <img src="https://raw.githubusercontent.com/NandhaKishorM/laya/main/assets/logo-lockup.png" alt="TEJAS 2026" width="380" />
-  </picture>
-</p>
 
-<h1 align="center">TEJAS 2026 — Edge AI Agent</h1>
+
+<h1 align="center">DIGITAL SWITCH — Edge AI Agent</h1>
 
 <p align="center">
   <strong>A production-ready Rust edge agent for microgrid telemetry inference with hardware actuation via MCP (Model Context Protocol)</strong>
